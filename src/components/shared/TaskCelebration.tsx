@@ -2,6 +2,14 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
+// Add all memes here. Filenames must exist in /public/
+const MEMES = [
+  '/michael.png',
+  '/1.png',
+  '/2.png',
+  '/3.png',
+];
+
 type Props = {
   show: boolean;
   onDone: () => void;
@@ -9,9 +17,12 @@ type Props = {
 
 export default function TaskCelebration({ show, onDone }: Props) {
   const [visible, setVisible] = useState(false);
+  const [meme, setMeme] = useState(MEMES[0]);
 
   useEffect(() => {
     if (!show) return;
+    // Pick a random meme each time
+    setMeme(MEMES[Math.floor(Math.random() * MEMES.length)]);
     setVisible(true);
     const t = setTimeout(() => {
       setVisible(false);
@@ -25,20 +36,19 @@ export default function TaskCelebration({ show, onDone }: Props) {
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.55)' }}
+      style={{ background: 'rgba(0,0,0,0.6)' }}
+      onClick={() => { setVisible(false); onDone(); }}
     >
       <div className="relative w-full max-w-sm mx-4 rounded-3xl overflow-hidden shadow-2xl animate-bounce-in">
         <Image
-          src="/michael.jpg"
-          alt="Great job!"
+          src={meme}
+          alt="Task done!"
           width={640}
           height={480}
           className="w-full h-auto object-cover"
           priority
+          unoptimized
         />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent py-4 px-5">
-          <p className="text-white font-black text-2xl text-center">Task done! 🤝</p>
-        </div>
       </div>
     </div>
   );
