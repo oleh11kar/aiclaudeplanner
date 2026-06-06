@@ -4,25 +4,41 @@ import { getTasks, updateTask } from '@/lib/storage';
 import { Task } from '@/lib/types';
 import PrioritySection from '@/components/today/PrioritySection';
 
-export default function TodayPage() {
+function todayISO() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function isToday(task: Task) {
+  // No deadline → belongs to Today
+  if (!task.deadline) return true;
+  // Deadline is today or overdue → Today
+  return task.deadline <= todayISO();
+}
+
+function byPriority(tasks: Task[]) {
+  return {
+    top: tasks.filter(t => t.priority === 'top'),
+    important: tasks.filter(t => t.priority === 'important'),
+    nice: tasks.filter(t => t.priority === 'nice' || t.priority === null),
+  };
+}
+
+export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  useEffect(() => {
-    loadTasks();
-  }, []);
+  useEffect(() => { loadTasks(); }, []);
 
   function loadTasks() {
-    const today = new Date().toDateString();
+    const todayStr = new Date().toDateString();
     const all = getTasks();
-    // Show 'today' tasks + today's 'done' tasks
-    const todayTasks = all.filter(t => {
+    const visible = all.filter(t => {
       if (t.status === 'today') return true;
       if (t.status === 'done' && t.completedAt) {
-        return new Date(t.completedAt).toDateString() === today;
+        return new Date(t.completedAt).toDateString() === todayStr;
       }
       return false;
     });
-    setTasks(todayTasks);
+    setTasks(visible);
   }
 
   function handleToggle(id: string) {
@@ -36,15 +52,20 @@ export default function TodayPage() {
     loadTasks();
   }
 
-  const top = tasks.filter(t => t.priority === 'top');
-  const important = tasks.filter(t => t.priority === 'important');
-  const nice = tasks.filter(t => t.priority === 'nice' || t.priority === null);
+  const todayTasks = tasks.filter(isToday);
+  const upcomingTasks = tasks
+    .filter(t => !isToday(t))
+    .sort((a, b) => (a.deadline! > b.deadline! ? 1 : -1));
+
+  const todayGroups = byPriority(todayTasks);
+  const upcomingGroups = byPriority(upcomingTasks);
 
   const isEmpty = tasks.length === 0;
 
   return (
     <div className="px-4 pt-4 pb-24">
-      <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Today</p>
+      <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Tasks</p>
+
       {isEmpty ? (
         <div className="text-center text-gray-400 mt-20">
           <p className="text-5xl mb-4">✅</p>
@@ -53,9 +74,35 @@ export default function TodayPage() {
         </div>
       ) : (
         <>
-          <PrioritySection title="Top Priority" tasks={top} onToggle={handleToggle} />
-          <PrioritySection title="Important" tasks={important} onToggle={handleToggle} />
-          <PrioritySection title="Nice to do" tasks={nice} onToggle={handleToggle} />
+          {/* ── Today ── */}
+          {todayTasks.length > 0 && (
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-base font-bold text-gray-900">Today</span>
+                <span className="text-xs bg-indigo-100 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
+                  {todayTasks.filter(t => t.status !== 'done').length} left
+                </span>
+              </div>
+              <PrioritySection title="Top Priority" tasks={todayGroups.top} onToggle={handleToggle} />
+              <PrioritySection title="Important" tasks={todayGroups.important} onToggle={handleToggle} />
+              <PrioritySection title="Nice to do" tasks={todayGroups.nice} onToggle={handleToggle} />
+            </div>
+          )}
+
+          {/* ── Upcoming Tasks ── */}
+          {upcomingTasks.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-base font-bold text-gray-900">Upcoming Tasks</span>
+                <span className="text-xs bg-orange-100 text-orange-700 font-semibold px-2 py-0.5 rounded-full">
+                  {upcomingTasks.length}
+                </span>
+              </div>
+              <PrioritySection title="Top Priority" tasks={upcomingGroups.top} onToggle={handleToggle} />
+              <PrioritySection title="Important" tasks={upcomingGroups.important} onToggle={handleToggle} />
+              <PrioritySection title="Nice to do" tasks={upcomingGroups.nice} onToggle={handleToggle} />
+            </div>
+          )}
         </>
       )}
     </div>

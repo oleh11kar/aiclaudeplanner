@@ -26,7 +26,7 @@ export default function BottomNav() {
   const tabs = [
     { href: '/capture', label: 'Capture', icon: MicIcon, badge: 0 },
     { href: '/inbox', label: 'Inbox', icon: InboxIcon, badge: inboxCount },
-    { href: '/today', label: 'Today', icon: CheckIcon, badge: todayCount },
+    { href: '/today', label: 'Tasks', icon: CheckIcon, badge: todayCount },
     { href: '/statistics', label: 'Stats', icon: ChartIcon, badge: 0 },
   ];
 

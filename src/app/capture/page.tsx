@@ -17,7 +17,6 @@ function blobToBase64(blob: Blob): Promise<string> {
 
 const LANGS = [
   { code: 'uk-UA', label: '🇺🇦 UA' },
-  { code: 'ru-RU', label: '🇷🇺 RU' },
   { code: 'en-US', label: '🇬🇧 EN' },
 ];
 
