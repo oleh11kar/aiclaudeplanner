@@ -27,7 +27,7 @@ export default function TaskCelebration({ show, onDone }: Props) {
     const t = setTimeout(() => {
       setVisible(false);
       onDone();
-    }, 2000);
+    }, 3000);
     return () => clearTimeout(t);
   }, [show, onDone]);
 
