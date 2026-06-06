@@ -4,6 +4,7 @@ import { getTasks, updateTask } from '@/lib/storage';
 import { Task } from '@/lib/types';
 import PrioritySection from '@/components/today/PrioritySection';
 import MotivationalCard from '@/components/today/MotivationalCard';
+import TaskCelebration from '@/components/shared/TaskCelebration';
 
 function todayISO() {
   return new Date().toISOString().split('T')[0];
@@ -26,6 +27,7 @@ function byPriority(tasks: Task[]) {
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [celebrate, setCelebrate] = useState(false);
 
   useEffect(() => { loadTasks(); }, []);
 
@@ -55,6 +57,7 @@ export default function TasksPage() {
       updateTask(id, { status: 'today', completedAt: null });
     } else {
       updateTask(id, { status: 'done', completedAt: new Date().toISOString() });
+      setCelebrate(true);
     }
     loadTasks();
   }
@@ -71,6 +74,7 @@ export default function TasksPage() {
 
   return (
     <div className="px-4 pt-4 pb-24">
+      <TaskCelebration show={celebrate} onDone={() => setCelebrate(false)} />
       <p className="text-2xl font-black text-gray-900 mb-4">Tasks</p>
 
       {isEmpty ? (
