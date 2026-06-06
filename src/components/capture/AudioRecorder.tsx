@@ -1,8 +1,12 @@
 'use client';
-import { useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+
+export type AudioRecorderHandle = {
+  stop: () => void;
+  isActive: () => boolean;
+};
 
 type Props = {
-  onAudioReady: (blob: Blob) => void;
   onTranscriptUpdate: (text: string) => void;
   disabled?: boolean;
   lang?: string;
@@ -10,21 +14,36 @@ type Props = {
 
 type RecordState = 'idle' | 'recording' | 'paused';
 
-export default function AudioRecorder({ onAudioReady, onTranscriptUpdate, disabled, lang = 'uk-UA' }: Props) {
+const AudioRecorder = forwardRef<AudioRecorderHandle, Props>(function AudioRecorder(
+  { onTranscriptUpdate, disabled, lang = 'uk-UA' },
+  ref
+) {
   const [state, setState] = useState<RecordState>('idle');
   const mediaRecorder = useRef<MediaRecorder | null>(null);
-  const chunks = useRef<Blob[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognition = useRef<any>(null);
 
+  useImperativeHandle(ref, () => ({
+    stop() {
+      if (mediaRecorder.current && mediaRecorder.current.state !== 'inactive') {
+        mediaRecorder.current.onstop = () => {
+          mediaRecorder.current?.stream.getTracks().forEach(t => t.stop());
+        };
+        mediaRecorder.current.stop();
+      }
+      try { recognition.current?.stop(); } catch {}
+      setState('idle');
+    },
+    isActive() {
+      return state !== 'idle';
+    },
+  }));
+
   async function startRecording() {
-    chunks.current = [];
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     mediaRecorder.current = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-    mediaRecorder.current.ondataavailable = e => { if (e.data.size > 0) chunks.current.push(e.data); };
     mediaRecorder.current.start(100);
 
-    // Web Speech API
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const win = window as any;
     const SR = win.SpeechRecognition || win.webkitSpeechRecognition;
@@ -56,18 +75,6 @@ export default function AudioRecorder({ onAudioReady, onTranscriptUpdate, disabl
     mediaRecorder.current?.resume();
     try { recognition.current?.start(); } catch {}
     setState('recording');
-  }
-
-  function ready() {
-    mediaRecorder.current?.stop();
-    try { recognition.current?.stop(); } catch {}
-    mediaRecorder.current!.onstop = () => {
-      const blob = new Blob(chunks.current, { type: 'audio/webm' });
-      onAudioReady(blob);
-      // Stop all audio tracks
-      mediaRecorder.current?.stream.getTracks().forEach(t => t.stop());
-    };
-    setState('idle');
   }
 
   if (state === 'idle') {
@@ -105,11 +112,9 @@ export default function AudioRecorder({ onAudioReady, onTranscriptUpdate, disabl
             Resume
           </button>
         )}
-        <button onClick={ready}
-          className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-semibold min-h-[44px] active:scale-95 transition-transform">
-          Ready
-        </button>
       </div>
     </div>
   );
-}
+});
+
+export default AudioRecorder;

@@ -17,4 +17,5 @@ export type Task = {
   completedAt: string | null;
   createdAt: string;
   needsClarification: NeedsClarification;
+  removedFromTasks?: boolean; // hides from Tasks view, stats unaffected
 };

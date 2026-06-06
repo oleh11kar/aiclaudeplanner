@@ -1,19 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import AudioRecorder from '@/components/capture/AudioRecorder';
+import AudioRecorder, { AudioRecorderHandle } from '@/components/capture/AudioRecorder';
 import LoadingOverlay from '@/components/shared/LoadingOverlay';
 import { addTasks } from '@/lib/storage';
 import { Task } from '@/lib/types';
-
-function blobToBase64(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve((reader.result as string).split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
 
 const LANGS = [
   { code: 'uk-UA', label: '🇺🇦 UA' },
@@ -25,6 +16,7 @@ export default function CapturePage() {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState('');
   const [lang, setLang] = useState('uk-UA');
+  const audioRef = useRef<AudioRecorderHandle>(null);
   const router = useRouter();
 
   function showToast(msg: string) {
@@ -32,8 +24,10 @@ export default function CapturePage() {
     setTimeout(() => setToast(''), 4000);
   }
 
-  async function processText() {
+  async function handleReady() {
     if (!text.trim()) return;
+    // Stop any active recording before processing
+    audioRef.current?.stop();
     setLoading(true);
     try {
       const res = await fetch('/api/process-capture', {
@@ -51,29 +45,10 @@ export default function CapturePage() {
     }
   }
 
-  async function handleAudioReady(blob: Blob) {
-    setLoading(true);
-    try {
-      const audio = await blobToBase64(blob);
-      const body = text.trim() ? { text, audio, lang } : { audio, lang };
-      const res = await fetch('/api/process-capture', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) throw new Error('Failed');
-      const { tasks } = await res.json() as { tasks: Task[] };
-      addTasks(tasks);
-      router.push('/inbox');
-    } catch {
-      setLoading(false);
-      showToast('AI processing failed. Try again.');
-    }
-  }
-
   return (
     <div className="flex flex-col h-full px-4 pt-4 pb-24">
       {loading && <LoadingOverlay />}
+
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Capture</p>
         <div className="flex gap-1">
@@ -98,17 +73,17 @@ export default function CapturePage() {
 
       {text.trim() && (
         <button
-          onClick={processText}
+          onClick={handleReady}
           disabled={loading}
           className="mt-4 w-full py-4 rounded-2xl bg-indigo-600 text-white font-semibold text-lg disabled:opacity-50 active:scale-95 transition-transform"
         >
-          Process
+          Ready
         </button>
       )}
 
       <div className="mt-6 flex justify-center">
         <AudioRecorder
-          onAudioReady={handleAudioReady}
+          ref={audioRef}
           onTranscriptUpdate={t => setText(t)}
           disabled={loading}
           lang={lang}

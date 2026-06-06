@@ -6,34 +6,59 @@ import LevelBadge from '@/components/statistics/LevelBadge';
 
 type Filter = 'day' | 'week' | 'month';
 
-function getDatesInRange(filter: Filter): string[] {
+function getChartData(filter: Filter, completedTasks: { completedAt: string }[]) {
+  if (filter === 'month') {
+    // Last 12 months aggregated
+    const months: { date: string; count: number }[] = [];
+    const now = new Date();
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const count = completedTasks.filter(t => t.completedAt.startsWith(key)).length;
+      months.push({ date: key, count });
+    }
+    return months;
+  }
+
+  // Day or Week: daily bars
+  const dayCount = filter === 'day' ? 1 : 7;
   const today = new Date();
-  const days: string[] = [];
-  const count = filter === 'day' ? 1 : filter === 'week' ? 7 : 30;
-  for (let i = count - 1; i >= 0; i--) {
+  const days: { date: string; count: number }[] = [];
+  for (let i = dayCount - 1; i >= 0; i--) {
     const d = new Date(today);
     d.setDate(today.getDate() - i);
-    days.push(d.toISOString().split('T')[0]);
+    const key = d.toISOString().split('T')[0];
+    const count = completedTasks.filter(t => t.completedAt.startsWith(key)).length;
+    days.push({ date: key, count });
   }
   return days;
 }
 
+function formatLabel(date: string, filter: Filter): string {
+  if (filter === 'month') {
+    // date is "YYYY-MM"
+    const d = new Date(date + '-01T00:00:00');
+    const month = d.toLocaleDateString('en', { month: 'short' }); // "Mar"
+    const year = String(d.getFullYear()).slice(2);                 // "26"
+    return `${month} ${year}`;
+  }
+  // date is "YYYY-MM-DD"
+  const d = new Date(date + 'T00:00:00');
+  if (filter === 'day') return d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+  return d.toLocaleDateString('en', { weekday: 'short' }); // "Mon"
+}
+
 export default function StatisticsPage() {
   const [filter, setFilter] = useState<Filter>('week');
-  const [chartData, setChartData] = useState<{ date: string; count: number }[]>([]);
+  const [chartData, setChartData] = useState<{ date: string; count: number; label: string }[]>([]);
   const [totalCompleted, setTotalCompleted] = useState(0);
 
   useEffect(() => {
     const tasks = getTasks();
-    const done = tasks.filter(t => t.status === 'done' && t.completedAt);
+    const done = tasks.filter(t => t.status === 'done' && t.completedAt) as { completedAt: string }[];
     setTotalCompleted(done.length);
-
-    const dates = getDatesInRange(filter);
-    const data = dates.map(date => ({
-      date,
-      count: done.filter(t => t.completedAt!.startsWith(date)).length,
-    }));
-    setChartData(data);
+    const raw = getChartData(filter, done);
+    setChartData(raw.map(d => ({ ...d, label: formatLabel(d.date, filter) })));
   }, [filter]);
 
   const filterBtns: { label: string; value: Filter }[] = [

@@ -32,6 +32,7 @@ export default function TasksPage() {
     const todayStr = new Date().toDateString();
     const all = getTasks();
     const visible = all.filter(t => {
+      if (t.removedFromTasks) return false;
       if (t.status === 'today') return true;
       if (t.status === 'done' && t.completedAt) {
         return new Date(t.completedAt).toDateString() === todayStr;
@@ -39,6 +40,11 @@ export default function TasksPage() {
       return false;
     });
     setTasks(visible);
+  }
+
+  function handleDelete(id: string) {
+    updateTask(id, { removedFromTasks: true });
+    loadTasks();
   }
 
   function handleToggle(id: string) {
@@ -83,9 +89,9 @@ export default function TasksPage() {
                   {todayTasks.filter(t => t.status !== 'done').length} left
                 </span>
               </div>
-              <PrioritySection title="Top Priority" tasks={todayGroups.top} onToggle={handleToggle} />
-              <PrioritySection title="Important" tasks={todayGroups.important} onToggle={handleToggle} />
-              <PrioritySection title="Nice to do" tasks={todayGroups.nice} onToggle={handleToggle} />
+              <PrioritySection title="Top Priority" tasks={todayGroups.top} onToggle={handleToggle} onDelete={handleDelete} />
+              <PrioritySection title="Important" tasks={todayGroups.important} onToggle={handleToggle} onDelete={handleDelete} />
+              <PrioritySection title="Nice to do" tasks={todayGroups.nice} onToggle={handleToggle} onDelete={handleDelete} />
             </div>
           )}
 
@@ -98,9 +104,9 @@ export default function TasksPage() {
                   {upcomingTasks.length}
                 </span>
               </div>
-              <PrioritySection title="Top Priority" tasks={upcomingGroups.top} onToggle={handleToggle} />
-              <PrioritySection title="Important" tasks={upcomingGroups.important} onToggle={handleToggle} />
-              <PrioritySection title="Nice to do" tasks={upcomingGroups.nice} onToggle={handleToggle} />
+              <PrioritySection title="Top Priority" tasks={upcomingGroups.top} onToggle={handleToggle} onDelete={handleDelete} />
+              <PrioritySection title="Important" tasks={upcomingGroups.important} onToggle={handleToggle} onDelete={handleDelete} />
+              <PrioritySection title="Nice to do" tasks={upcomingGroups.nice} onToggle={handleToggle} onDelete={handleDelete} />
             </div>
           )}
         </>

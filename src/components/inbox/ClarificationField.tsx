@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Task, Priority } from '@/lib/types';
+// duration clarification is intentionally skipped
 
 type Props = {
   task: Task;
@@ -9,7 +10,6 @@ type Props = {
 
 export default function ClarificationField({ task, onUpdate }: Props) {
   const { needsClarification } = task;
-  const [durationInput, setDurationInput] = useState('');
   const [deadlineInput, setDeadlineInput] = useState('');
 
   // Show one at a time: priority → duration → deadline
@@ -29,30 +29,6 @@ export default function ClarificationField({ task, onUpdate }: Props) {
               {p === 'top' ? '🔴 Top Priority' : p === 'important' ? '🟠 Important' : '⚪ Nice to do'}
             </button>
           ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (needsClarification.duration) {
-    return (
-      <div className="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-200">
-        <p className="text-sm text-blue-800 font-medium mb-2">{needsClarification.duration}</p>
-        <div className="flex gap-2">
-          <input type="number" min="1" placeholder="minutes"
-            value={durationInput} onChange={e => setDurationInput(e.target.value)}
-            className="flex-1 px-3 py-2 rounded-lg border border-gray-300 text-base min-h-[44px]"
-            style={{ fontSize: '16px' }}
-          />
-          <button onClick={() => {
-            if (!durationInput) return;
-            const nc = { ...needsClarification };
-            delete nc.duration;
-            onUpdate({ durationMin: parseInt(durationInput), needsClarification: nc });
-          }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold min-h-[44px]">
-            OK
-          </button>
         </div>
       </div>
     );
