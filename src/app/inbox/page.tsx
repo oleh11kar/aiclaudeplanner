@@ -32,7 +32,7 @@ export default function InboxPage() {
 
   return (
     <div className="px-4 pt-4 pb-24">
-      <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Inbox</p>
+      <p className="text-2xl font-black text-gray-900 mb-4">Inbox</p>
       {tasks.length === 0 ? (
         <div className="text-center text-gray-400 mt-20">
           <p className="text-5xl mb-4">📭</p>

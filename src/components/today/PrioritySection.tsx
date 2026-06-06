@@ -13,8 +13,8 @@ export default function PrioritySection({ title, tasks, onToggle, onDelete }: Pr
   if (tasks.length === 0) return null;
   return (
     <div className="mb-4">
-      <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2 px-1">{title}</p>
-      <div className="bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100 px-4">
+      <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2 px-1">{title}</p>
+      <div className="bg-white rounded-3xl divide-y divide-gray-100 px-4 shadow-sm">
         {tasks.map(task => (
           <TaskCheckItem key={task.id} task={task} onToggle={onToggle} onDelete={onDelete} />
         ))}

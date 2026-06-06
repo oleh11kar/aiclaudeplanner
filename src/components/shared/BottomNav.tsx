@@ -31,19 +31,20 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200"
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100"
          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div className="flex h-14">
+      <div className="flex h-16 px-2">
         {tabs.map(({ href, label, icon: Icon, badge }) => {
           const active = pathname === href;
           return (
             <Link key={href} href={href}
-              className={`flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-medium transition-colors
-                ${active ? 'text-indigo-600' : 'text-gray-500'}`}>
-              <div className="relative">
-                <Icon className={`w-6 h-6 ${active ? 'text-indigo-600' : 'text-gray-400'}`} />
+              className={`flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold transition-colors
+                ${active ? 'text-violet-600' : 'text-gray-400'}`}>
+              <div className={`relative flex items-center justify-center w-10 h-7 rounded-2xl transition-colors
+                ${active ? 'bg-violet-100' : ''}`}>
+                <Icon className={`w-5 h-5 ${active ? 'text-violet-600' : 'text-gray-400'}`} />
                 {badge > 0 && (
-                  <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black rounded-full min-w-[15px] h-[15px] flex items-center justify-center px-1">
                     {badge}
                   </span>
                 )}

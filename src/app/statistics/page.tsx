@@ -69,13 +69,13 @@ export default function StatisticsPage() {
 
   return (
     <div className="px-4 pt-4 pb-24">
-      <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Statistics</p>
+      <p className="text-2xl font-black text-gray-900 mb-4">Statistics</p>
 
       <div className="flex gap-2 mb-5">
         {filterBtns.map(({ label, value }) => (
           <button key={value} onClick={() => setFilter(value)}
-            className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-colors min-h-[44px]
-              ${filter === value ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
+            className={`flex-1 py-2.5 rounded-full text-sm font-black transition-colors min-h-[44px]
+              ${filter === value ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
             {label}
           </button>
         ))}

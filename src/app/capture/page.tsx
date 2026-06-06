@@ -50,12 +50,12 @@ export default function CapturePage() {
       {loading && <LoadingOverlay />}
 
       <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Capture</p>
+        <p className="text-2xl font-black text-gray-900">Capture</p>
         <div className="flex gap-1">
           {LANGS.map(l => (
             <button key={l.code} onClick={() => setLang(l.code)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px]
-                ${lang === l.code ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
+              className={`px-4 py-1.5 rounded-full text-sm font-black transition-colors min-h-[36px]
+                ${lang === l.code ? 'bg-violet-600 text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
               {l.label}
             </button>
           ))}
@@ -66,7 +66,7 @@ export default function CapturePage() {
         value={text}
         onChange={e => setText(e.target.value)}
         placeholder="Write or dictate everything on your mind…"
-        className="flex-1 w-full resize-none rounded-2xl border border-gray-200 bg-gray-50 p-4 text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[40vh]"
+        className="flex-1 w-full resize-none rounded-3xl border-0 bg-white shadow-sm p-5 text-base font-semibold text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-400 min-h-[40vh]"
         style={{ fontSize: '16px' }}
         disabled={loading}
       />
@@ -75,7 +75,7 @@ export default function CapturePage() {
         <button
           onClick={handleReady}
           disabled={loading}
-          className="mt-4 w-full py-4 rounded-2xl bg-indigo-600 text-white font-semibold text-lg disabled:opacity-50 active:scale-95 transition-transform"
+          className="mt-4 w-full py-4 rounded-3xl bg-gray-900 text-white font-black text-lg disabled:opacity-50 active:scale-95 transition-transform"
         >
           Ready
         </button>
