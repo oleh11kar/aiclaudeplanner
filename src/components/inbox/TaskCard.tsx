@@ -84,7 +84,7 @@ export default function TaskCard({ task, onUpdate, onMoveToToday, onDelete }: Pr
       <div className="flex gap-2 mt-1">
         <button onClick={() => onMoveToToday(task.id)}
           className={`flex-1 py-3 rounded-2xl font-bold text-sm min-h-[44px] active:scale-95 transition-transform ${theme.btn}`}>
-          Add to Today →
+          Add Task
         </button>
         <button onClick={() => onDelete(task.id)}
           className="py-3 px-4 rounded-2xl bg-black/15 text-white font-bold text-sm min-h-[44px] active:scale-95 transition-transform">
