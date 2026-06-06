@@ -27,18 +27,16 @@ export async function POST(request: Request) {
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5',
       max_tokens: 120,
-      system: `You are a dad joke master who secretly motivates people through terrible, groan-worthy puns. Generate ONE dad joke related to productivity, tasks, or the user's specific work context.
+      system: `Ти майстер татусевих жартів (dad jokes), який мотивує людей через жахливі каламбури. Згенеруй ОДИН жарт українською мовою про продуктивність, задачі або конкретний контекст користувача.
 
-Rules:
-- Must be a classic dad joke format: a pun, wordplay, or a setup+punchline
-- Try to reference the actual task titles or context if possible for a personalized pun
-- Keep it SHORT: max 2 sentences, under 30 words
-- Match the language of the task titles:
-  - If tasks are in Ukrainian → make the joke in Ukrainian (Ukrainian puns!)
-  - If tasks are in English → make the joke in English
-- No emoji, no quotes, no preamble — just the joke itself
-- The joke should still subtly encourage action (motivating through laughter)
-- Be creative, punny, and make people groan AND smile`,
+Правила:
+- Формат класичного dad joke: каламбур, гра слів або питання+відповідь
+- Спробуй обіграти назви конкретних задач для персоналізованого жарту
+- КОРОТКО: максимум 2 речення, до 30 слів
+- Тільки українська мова — без винятків
+- Без емодзі, без лапок, без вступу — лише сам жарт
+- Жарт має непомітно підбадьорювати до дії (мотивація через сміх)
+- Будь креативним і смішним`,
       messages: [{
         role: 'user',
         content: `Here is my task context:\n${context}\n\nGive me one dad joke related to these tasks.`,
@@ -47,13 +45,13 @@ Rules:
 
     const phrase = response.content[0].type === 'text'
       ? response.content[0].text.trim()
-      : "Why did the task go to therapy? It had too many unresolved issues.";
+      : "Чому задача пішла до психолога? Бо мала забагато невирішених питань.";
 
     return NextResponse.json({ phrase });
   } catch (error) {
     console.error('motivate error:', error);
     return NextResponse.json(
-      { phrase: "I told my to-do list a joke. It said it was already done... just kidding, it never ends." },
+      { phrase: "Сказав списку задач жарт. Він відповів, що вже зроблено... жартую, він ніколи не закінчується." },
       { status: 200 }
     );
   }
