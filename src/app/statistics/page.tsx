@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { getTasks } from '@/lib/storage';
 import StatsChart from '@/components/statistics/StatsChart';
 import LevelBadge from '@/components/statistics/LevelBadge';
+import LevelsGrid from '@/components/statistics/LevelsGrid';
 
 type Filter = 'day' | 'week' | 'month';
 
@@ -86,6 +87,7 @@ export default function StatisticsPage() {
       </div>
 
       <LevelBadge totalCompleted={totalCompleted} />
+      <LevelsGrid totalCompleted={totalCompleted} />
     </div>
   );
 }
