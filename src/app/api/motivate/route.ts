@@ -27,30 +27,33 @@ export async function POST(request: Request) {
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5',
       max_tokens: 120,
-      system: `You are a concise motivational coach. Generate ONE short motivational phrase (1-2 sentences max, under 25 words) to help the user stay focused and energized.
+      system: `You are a dad joke master who secretly motivates people through terrible, groan-worthy puns. Generate ONE dad joke related to productivity, tasks, or the user's specific work context.
 
 Rules:
-- Be specific, direct, and energizing — not generic
-- Match the language of the task titles (Ukrainian or English)
-- If tasks are in Ukrainian → respond in Ukrainian
-- If tasks are in English → respond in English
-- No emoji, no quotes, no preamble — just the phrase itself
-- Focus on action, progress, and capability`,
+- Must be a classic dad joke format: a pun, wordplay, or a setup+punchline
+- Try to reference the actual task titles or context if possible for a personalized pun
+- Keep it SHORT: max 2 sentences, under 30 words
+- Match the language of the task titles:
+  - If tasks are in Ukrainian → make the joke in Ukrainian (Ukrainian puns!)
+  - If tasks are in English → make the joke in English
+- No emoji, no quotes, no preamble — just the joke itself
+- The joke should still subtly encourage action (motivating through laughter)
+- Be creative, punny, and make people groan AND smile`,
       messages: [{
         role: 'user',
-        content: `Here is my task context:\n${context}\n\nGive me one short motivational phrase.`,
+        content: `Here is my task context:\n${context}\n\nGive me one dad joke related to these tasks.`,
       }],
     });
 
     const phrase = response.content[0].type === 'text'
       ? response.content[0].text.trim()
-      : 'You have everything you need to crush today.';
+      : "Why did the task go to therapy? It had too many unresolved issues.";
 
     return NextResponse.json({ phrase });
   } catch (error) {
     console.error('motivate error:', error);
     return NextResponse.json(
-      { phrase: 'Focus on one task at a time. Progress beats perfection.' },
+      { phrase: "I told my to-do list a joke. It said it was already done... just kidding, it never ends." },
       { status: 200 }
     );
   }

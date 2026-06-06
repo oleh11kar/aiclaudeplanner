@@ -45,7 +45,7 @@ export default function MotivationalCard({ tasks }: Props) {
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
             <p className="text-[11px] font-bold uppercase tracking-widest text-indigo-200 mb-2">
-              💡 Motivation
+              😄 Dad Joke of the Day
             </p>
             {loading ? (
               <div className="flex items-center gap-2">
