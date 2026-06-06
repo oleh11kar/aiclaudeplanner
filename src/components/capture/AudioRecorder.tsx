@@ -5,11 +5,12 @@ type Props = {
   onAudioReady: (blob: Blob) => void;
   onTranscriptUpdate: (text: string) => void;
   disabled?: boolean;
+  lang?: string;
 };
 
 type RecordState = 'idle' | 'recording' | 'paused';
 
-export default function AudioRecorder({ onAudioReady, onTranscriptUpdate, disabled }: Props) {
+export default function AudioRecorder({ onAudioReady, onTranscriptUpdate, disabled, lang = 'uk-UA' }: Props) {
   const [state, setState] = useState<RecordState>('idle');
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
@@ -31,6 +32,7 @@ export default function AudioRecorder({ onAudioReady, onTranscriptUpdate, disabl
       recognition.current = new SR();
       recognition.current.continuous = true;
       recognition.current.interimResults = true;
+      recognition.current.lang = lang;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.current.onresult = (e: any) => {
         let transcript = '';

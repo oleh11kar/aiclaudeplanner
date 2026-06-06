@@ -15,10 +15,17 @@ function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
+const LANGS = [
+  { code: 'uk-UA', label: '🇺🇦 UA' },
+  { code: 'ru-RU', label: '🇷🇺 RU' },
+  { code: 'en-US', label: '🇬🇧 EN' },
+];
+
 export default function CapturePage() {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState('');
+  const [lang, setLang] = useState('uk-UA');
   const router = useRouter();
 
   function showToast(msg: string) {
@@ -33,7 +40,7 @@ export default function CapturePage() {
       const res = await fetch('/api/process-capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, lang }),
       });
       if (!res.ok) throw new Error('Failed');
       const { tasks } = await res.json() as { tasks: Task[] };
@@ -49,7 +56,7 @@ export default function CapturePage() {
     setLoading(true);
     try {
       const audio = await blobToBase64(blob);
-      const body = text.trim() ? { text, audio } : { audio };
+      const body = text.trim() ? { text, audio, lang } : { audio, lang };
       const res = await fetch('/api/process-capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -68,7 +75,18 @@ export default function CapturePage() {
   return (
     <div className="flex flex-col h-full px-4 pt-4 pb-24">
       {loading && <LoadingOverlay />}
-      <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Capture</p>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Capture</p>
+        <div className="flex gap-1">
+          {LANGS.map(l => (
+            <button key={l.code} onClick={() => setLang(l.code)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px]
+                ${lang === l.code ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
+              {l.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <textarea
         value={text}
@@ -94,6 +112,7 @@ export default function CapturePage() {
           onAudioReady={handleAudioReady}
           onTranscriptUpdate={t => setText(t)}
           disabled={loading}
+          lang={lang}
         />
       </div>
 
