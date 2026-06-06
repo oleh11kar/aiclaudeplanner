@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { getTasks, updateTask } from '@/lib/storage';
 import { Task } from '@/lib/types';
 import PrioritySection from '@/components/today/PrioritySection';
+import MotivationalCard from '@/components/today/MotivationalCard';
 
 function todayISO() {
   return new Date().toISOString().split('T')[0];
@@ -109,6 +110,8 @@ export default function TasksPage() {
               <PrioritySection title="Nice to do" tasks={upcomingGroups.nice} onToggle={handleToggle} onDelete={handleDelete} />
             </div>
           )}
+
+          <MotivationalCard tasks={tasks} />
         </>
       )}
     </div>
